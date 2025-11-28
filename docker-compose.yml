@@ -1,0 +1,45 @@
+
+services:
+  db:
+    image: mongo:7.0
+    container_name: mean-mongo-prod
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 40s
+
+
+  backend:
+    image: harshita887/mean_backend:latest
+    container_name: mean-backend-prod
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      MONGO_URI: mongodb://root:example@mean-mongo-prod:27017/discoverdollar?authSource=admin
+      PORT: 5000
+
+  frontend:
+    image: harshita887/mean_nginx:latest
+    container_name: mean-nginx-prod
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  mongo-data:
