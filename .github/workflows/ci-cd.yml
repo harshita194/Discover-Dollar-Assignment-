@@ -51,7 +51,7 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            cd mean-crud-devops-task
+            cd ~/Discover-Dollar-Assignment-
             git pull origin main
             docker compose -f docker-compose.yml pull
             docker compose -f docker-compose.yml up -d
